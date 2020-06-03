@@ -1,0 +1,61 @@
+version: '3.5'
+
+networks:
+  cakephp:
+
+services:
+  nginx:
+    image: nginx:1.16-alpine
+    container_name: webserver_nginxa
+    ports:
+      - "8088:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - cakephp
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql_nginxa
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: cakephp
+      MYSQL_USER: root
+      MYSQL_PASSWORD: tuanda
+      MYSQL_ROOT_PASSWORD: tuanda
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - cakephp
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_nginxa
+    restart: always
+    environment:
+      PMA_HOST: mysql_nginx
+    ports:
+      - "8080:80"
+    networks:
+      - cakephp
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php_nginxa
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "9000:9000"
+    networks:
+      - cakephp
