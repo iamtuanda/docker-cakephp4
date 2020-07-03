@@ -42,7 +42,7 @@ services:
     container_name: phpmyadmin_nginxa
     restart: always
     environment:
-      PMA_HOST: mysql_nginx
+      PMA_HOST: mysql_nginxa
     ports:
       - "8080:80"
     networks:
